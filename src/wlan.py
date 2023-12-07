@@ -7,7 +7,7 @@ def connect():
     wlan.active(True)
     wlan.connect("Tima", "00000000")
 
-    wait = 20
+    wait = 10
     while wait > 0:
         if wlan.status() < 0 or wlan.status() >= 3:
             break
