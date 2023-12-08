@@ -39,44 +39,13 @@ class App:
         self.__connect_to_wifi()
         if not self.__check_api_health():
             return
+
+        self.__display.print("Devices:", line=1, clear_full=True)
         self.__display_current_device()
 
         while True:
-            if self.__buttons.was_left_button_pressed():
-                self.__display.print("Loading...", line=2, clear_line=True)
-                current_device_data = self.__api.previous_device()
-                self.__change_device(current_device_data)
-                self.__buttons.reset()
-
-            if self.__buttons.was_right_button_pressed():
-                self.__display.print("Loading...", line=2, clear_line=True)
-                current_device_data = self.__api.next_device()
-                self.__change_device(current_device_data)
-                self.__buttons.reset()
-
-            if time.time() - self.__last_rfid_successful_read_time > self.__rfid_read_delay:
-                card_id = self.__rfid.read_card_id()
-
-                if not card_id:
-                    continue
-
-                self.__display.print("Reading card...", line=2, clear_line=True)
-
-                if card_id not in Config.TRACKS:
-                    self.__display.print(f"{chr(Symbols.CROSS.index)} Unknown card", line=2, clear_line=True)
-                    self.__buzzer.play_failure()
-                    time.sleep(1)
-                    self.__display_current_device()
-                    continue
-
-                track = Config.TRACKS[card_id]
-                self.__api.play(track.id)
-                self.__display.print(f"{chr(Symbols.NOTE.index)} {track.name}", line=2, clear_line=True)
-                self.__buzzer.play_success()
-                time.sleep(1)
-                self.__display_current_device()
-
-                self.__last_rfid_successful_read_time = time.time()
+            self.__check_buttons_press()
+            self.__check_rfid_read()
 
     def __connect_to_wifi(self) -> None:
         self.__display.print_centered("WiFi", line=2)
@@ -99,19 +68,59 @@ class App:
         return True
 
     def __display_current_device(self) -> None:
-        self.__display.clear()
-        self.__display.print("Devices:", line=1)
-
+        self.__display.print("Loading...", line=2, clear_line=True)
         current_device_data = self.__api.get_current_device(reset=True)
-        self.__change_device(current_device_data)
+        self.__display_device(current_device_data)
 
-    def __change_device(self, device_data: dict) -> None:
+    def __display_device(self, device_data: dict) -> None:
         if device_data == {}:
             self.__display.print("No devices", line=2)
             return
 
         text = f"{device_data['index'] + 1}/{device_data['total']} {device_data['device']['name']}"
         self.__display.print(text, line=2)
+
+    def __check_buttons_press(self) -> None:
+        was_left_button_pressed = self.__buttons.was_left_button_pressed()
+        was_right_button_pressed = self.__buttons.was_right_button_pressed()
+
+        if not any((was_left_button_pressed, was_right_button_pressed)):
+            return
+
+        self.__display.print("Loading...", line=2, clear_line=True)
+
+        if was_left_button_pressed:
+            current_device_data = self.__api.previous_device()
+        elif was_right_button_pressed:
+            current_device_data = self.__api.next_device()
+
+        self.__display_device(current_device_data)
+        self.__buttons.reset()
+
+    def __check_rfid_read(self) -> None:
+        if time.time() - self.__last_rfid_successful_read_time <= self.__rfid_read_delay:
+            return
+
+        card_id = self.__rfid.read_card_id()
+
+        if not card_id:
+            return
+
+        self.__display.print("Reading card...", line=2, clear_line=True)
+
+        if card_id not in Config.TRACKS:
+            self.__display.print(f"{chr(Symbols.CROSS.index)} Unknown card", line=2, clear_line=True)
+            self.__buzzer.play_failure()
+        else:
+            track = Config.TRACKS[card_id]
+            self.__api.play(track.id)
+            self.__display.print(f"{chr(Symbols.NOTE.index)} {track.name}", line=2, clear_line=True)
+            self.__buzzer.play_success()
+
+        time.sleep(1)
+        self.__display_current_device()
+
+        self.__last_rfid_successful_read_time = time.time()
 
 
 if __name__ == "__main__":
