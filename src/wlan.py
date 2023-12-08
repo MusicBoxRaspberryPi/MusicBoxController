@@ -2,10 +2,10 @@ import network
 import time
 
 
-def connect():
+def connect(ssid: str, password: str) -> None:
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    wlan.connect("Tima", "00000000")
+    wlan.connect(ssid, password)
 
     wait = 10
     while wait > 0:

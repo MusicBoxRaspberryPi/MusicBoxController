@@ -1,0 +1,35 @@
+class Track:
+    def __init__(self, id: str, name: str):
+        self.id = id
+        self.name = name
+
+
+class Config:
+    TRACKS = {
+        4117885779: Track(id="3uMUdlo47oEes3kgL4T4EC", name="Nonstop"),
+        4233351011: Track(id="5UW6yvwo3nVA609NgprdhK", name="Supermarket")
+    }
+
+    class Wifi:
+        SSID = "WIFI_SSID"
+        PASSWORD = "WIFI_PASSWORD"
+
+    class Buttons:
+        LEFT_PIN = 12
+        RIGHT_PIN = 13
+
+    class Display:
+        SDA_PIN = 0
+        SCL_PIN = 1
+
+    BUZZER_PIN = 11
+
+    class RFID:
+        SDA_PIN = 15
+        SCK_PIN = 18
+        MOSI_PIN = 19
+        MISO_PIN = 16
+        RST_PIN = 14
+        READ_DELAY = 2
+
+    API_BASE_URL = "http://apiurl.com"
