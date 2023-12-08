@@ -39,17 +39,17 @@ class App:
         self.__display_current_device()
 
         while True:
-            self.__buttons.update()
-
-            if self.__buttons.is_left_button_pressed():
+            if self.__buttons.was_left_button_pressed():
                 self.__display.print("Loading...", line=2, clear_line=True)
                 current_device_data = self.__api.previous_device()
                 self.__change_device(current_device_data)
+                self.__buttons.reset()
 
-            if self.__buttons.is_right_button_pressed():
+            if self.__buttons.was_right_button_pressed():
                 self.__display.print("Loading...", line=2, clear_line=True)
                 current_device_data = self.__api.next_device()
                 self.__change_device(current_device_data)
+                self.__buttons.reset()
 
             if time.time() - self.__last_rfid_successful_read_time > self.__rfid_read_delay:
                 card_id = self.__rfid.read_card_id()
