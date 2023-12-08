@@ -74,7 +74,7 @@ class App:
         self.__display.clear()
         self.__display.print("Devices:", line=1)
 
-        current_device_data = self.__api.get_current_device()
+        current_device_data = self.__api.get_current_device(reset=True)
         self.__change_device(current_device_data)
 
     def __change_device(self, device_data: dict) -> None:
