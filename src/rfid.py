@@ -8,7 +8,11 @@ class RFIDInterface:
     def read_card_id(self):
         self.__rfid.init()
         (stat, tag_type) = self.__rfid.request(self.__rfid.REQIDL)
-        if stat == self.__rfid.OK:
-            (stat, uid) = self.__rfid.SelectTagSN()
-            if stat == self.__rfid.OK:
-                return int.from_bytes(bytes(uid), "little", False)
+        if stat != self.__rfid.OK:
+            return None
+
+        (stat, uid) = self.__rfid.SelectTagSN()
+        if stat != self.__rfid.OK:
+            return None
+
+        return int.from_bytes(bytes(uid), "little", False)
