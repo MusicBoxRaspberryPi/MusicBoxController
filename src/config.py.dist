@@ -11,8 +11,8 @@ class Config:
     }
 
     class Wifi:
-        SSID = "Tima"
-        PASSWORD = "00000000"
+        SSID = "WIFI_SSID"
+        PASSWORD = "WIFI_PASSWORD"
 
     class Buttons:
         LEFT_PIN = 12
@@ -32,4 +32,4 @@ class Config:
         RST_PIN = 14
         READ_DELAY = 2
 
-    API_BASE_URL = "http://185.185.71.49:8000"
+    API_BASE_URL = "http://apiurl.com"
