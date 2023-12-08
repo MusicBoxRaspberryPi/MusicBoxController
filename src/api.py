@@ -8,12 +8,18 @@ class ApiInterface:
         "accept": "application/json"
     }
 
-    __BASE_URL = "http://185.185.71.49:8000"
-    __HEALTH_URL = __BASE_URL + "/health"
-    __DEVICE_URL = __BASE_URL + "/device"
-    __NEXT_DEVICE_URL = __DEVICE_URL + "/next"
-    __PREVIOUS_DEVICE_URL = __DEVICE_URL + "/previous"
-    __PLAY_URL = __BASE_URL + "/play"
+    def __init__(self, base_url: str):
+        if "https" in base_url:
+            raise ValueError("Base URL must not contain https://")
+        if "http://" not in base_url:
+            base_url = "http://" + base_url
+
+        self.__base_url = base_url
+        self.__health_url = base_url + "/health"
+        self.__play_url = base_url + "/play"
+        self.__device_url = base_url + "/device"
+        self.__next_device_url = self.__device_url + "/next"
+        self.__previous_device_url = self.__device_url + "/previous"
 
     def request(self, method: str, url: str, data=None, params=None) -> urequests.Response:
         if data is None:
@@ -41,18 +47,18 @@ class ApiInterface:
 
     def check_health(self) -> bool:
         try:
-            return self.request("GET", self.__HEALTH_URL).status_code == 200
+            return self.request("GET", self.__health_url).status_code == 200
         except:
             return False
 
     def get_current_device(self, reset: bool = False) -> dict:
-        return self.request("GET", self.__DEVICE_URL, params={"reset": reset}).json()
+        return self.request("GET", self.__device_url, params={"reset": reset}).json()
 
     def next_device(self) -> dict:
-        return self.request("POST", self.__NEXT_DEVICE_URL).json()
+        return self.request("POST", self.__next_device_url).json()
 
     def previous_device(self) -> dict:
-        return self.request("POST", self.__PREVIOUS_DEVICE_URL).json()
+        return self.request("POST", self.__previous_device_url).json()
 
     def play(self, track: str) -> dict:
-        return self.request("POST", self.__PLAY_URL, {"id": track}).json()
+        return self.request("POST", self.__play_url, {"id": track}).json()

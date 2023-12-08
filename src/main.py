@@ -6,28 +6,31 @@ from api import ApiInterface
 from buttons import ButtonsInterface
 from buzzer import BuzzerInterface
 from rfid import RFIDInterface
-
-
-class Track:
-    def __init__(self, id: str, name: str):
-        self.id = id
-        self.name = name
+from config import Config
 
 
 class App:
     def __init__(self):
-        self.__display = DisplayInterface(sda_pin=0, scl_pin=1)
-        self.__api = ApiInterface()
-        self.__buttons = ButtonsInterface(left_button_pin=12, right_button_pin=13)
-        self.__buzzer = BuzzerInterface(pin=11)
-        self.__rfid = RFIDInterface(sda_pin=15, sck_pin=18, mosi_pin=19, miso_pin=16, rst_pin=14)
-        self.__last_rfid_successful_read_time = 0
-        self.__rfid_read_delay = 2
+        self.__display = DisplayInterface(
+            sda_pin=Config.Display.SDA_PIN,
+            scl_pin=Config.Display.SCL_PIN
+        )
+        self.__buttons = ButtonsInterface(
+            left_button_pin=Config.Buttons.LEFT_PIN,
+            right_button_pin=Config.Buttons.RIGHT_PIN
+        )
+        self.__rfid = RFIDInterface(
+            sda_pin=Config.RFID.SDA_PIN,
+            sck_pin=Config.RFID.SCK_PIN,
+            mosi_pin=Config.RFID.MOSI_PIN,
+            miso_pin=Config.RFID.MISO_PIN,
+            rst_pin=Config.RFID.RST_PIN
+        )
+        self.__buzzer = BuzzerInterface(pin=Config.BUZZER_PIN)
+        self.__api = ApiInterface(base_url=Config.API_BASE_URL)
 
-        self.__tracks = {
-            4117885779: Track(id="3uMUdlo47oEes3kgL4T4EC", name="Nonstop"),
-            4233351011: Track(id="5UW6yvwo3nVA609NgprdhK", name="Supermarket")
-        }
+        self.__last_rfid_successful_read_time = 0
+        self.__rfid_read_delay = Config.RFID.READ_DELAY
 
     def run(self) -> None:
         self.__display.print_centered(f"{chr(Symbols.NOTE.index)} Music Box {chr(Symbols.NOTE.index)}", line=1)
@@ -59,14 +62,14 @@ class App:
 
                 self.__display.print("Reading card...", line=2, clear_line=True)
 
-                if card_id not in self.__tracks:
+                if card_id not in Config.TRACKS:
                     self.__display.print(f"{chr(Symbols.CROSS.index)} Unknown card", line=2, clear_line=True)
                     self.__buzzer.play_failure()
                     time.sleep(1)
                     self.__display_current_device()
                     continue
 
-                track = self.__tracks[card_id]
+                track = Config.TRACKS[card_id]
                 self.__api.play(track.id)
                 self.__display.print(f"{chr(Symbols.NOTE.index)} {track.name}", line=2, clear_line=True)
                 self.__buzzer.play_success()
@@ -78,7 +81,7 @@ class App:
     def __connect_to_wifi(self) -> None:
         self.__display.print_centered("WiFi", line=2)
 
-        wlan.connect()
+        wlan.connect(Config.Wifi.SSID, Config.Wifi.PASSWORD)
 
         self.__display.print_centered(f"{chr(Symbols.TICK.index)} WiFi  ", line=2)
         self.__buzzer.play_success()
