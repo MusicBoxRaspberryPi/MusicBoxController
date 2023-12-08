@@ -25,6 +25,8 @@ class ApiInterface:
         if query_string:
             url = f"{url}?{query_string}"
 
+        print(f"Requesting {method} {url} {'with data' if data else ''}...")
+
         if method == "GET":
             if data:
                 raise ValueError("GET requests cannot have data, use params instead")
@@ -32,6 +34,8 @@ class ApiInterface:
             resp = urequests.request(method, url, headers=self.__HEADERS)
         else:
             resp = urequests.request(method, url, headers=self.__HEADERS, data=json.dumps(data))
+
+        print(f"Response ({resp.status_code}): {resp.text}")
 
         return resp
 

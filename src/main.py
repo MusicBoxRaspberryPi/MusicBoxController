@@ -82,8 +82,6 @@ class App:
             self.__display.print("No devices", line=2)
             return
 
-        print(device_data)
-
         text = f"{device_data['index'] + 1}/{device_data['total']} {device_data['device']['name']}"
         self.__display.print(text, line=2)
 
