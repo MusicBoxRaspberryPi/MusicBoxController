@@ -78,6 +78,12 @@ class App:
         self.__change_device(current_device_data)
 
     def __change_device(self, device_data: dict) -> None:
+        if device_data == {}:
+            self.__display.print("No devices", line=2)
+            return
+
+        print(device_data)
+
         text = f"{device_data['index'] + 1}/{device_data['total']} {device_data['device']['name']}"
         self.__display.print(text, line=2)
 
