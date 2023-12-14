@@ -32,6 +32,16 @@ class App:
         self.__last_rfid_successful_read_time = 0
         self.__rfid_read_delay = Config.RFID.READ_DELAY
 
+    def handle_error(self, exception: Exception) -> None:
+        self.__display.clear()
+        self.__display.print_centered("Exception", line=1)
+        self.__display.print_centered("occurred", line=2)
+        self.__buzzer.play_failure()
+
+        time.sleep(2)
+
+        self.__display.print_scroll_text(f"{type(exception).__name__}:{str(exception)}", line=2)
+
     def run(self) -> None:
         self.__display.print_centered(f"{chr(Symbols.NOTE.index)} Music Box {chr(Symbols.NOTE.index)}", line=1)
         self.__display.print_centered("Initializing...", line=2)
@@ -127,4 +137,8 @@ class App:
 
 if __name__ == "__main__":
     app = App()
-    app.run()
+
+    try:
+        app.run()
+    except Exception as e:
+        app.handle_error(e)
