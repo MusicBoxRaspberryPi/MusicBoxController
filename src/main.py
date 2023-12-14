@@ -32,6 +32,16 @@ class App:
         self.__last_rfid_successful_read_time = 0
         self.__rfid_read_delay = Config.RFID.READ_DELAY
 
+    def handle_error(self, exception: Exception) -> None:
+        self.__display.clear()
+        self.__display.print_centered("Exception", line=1)
+        self.__display.print_centered("occurred", line=2)
+        self.__buzzer.play_failure()
+
+        time.sleep(2)
+
+        self.__display.print_scroll_text(f"{type(exception).__name__}:{str(exception)}", line=2)
+
     def run(self) -> None:
         self.__display.print_centered(f"{chr(Symbols.NOTE.index)} Music Box {chr(Symbols.NOTE.index)}", line=1)
         self.__display.print_centered("Initializing...", line=2)
@@ -41,7 +51,7 @@ class App:
             return
 
         self.__display.print("Devices:", line=1, clear_full=True)
-        self.__display_current_device()
+        self.__display_current_device(reset=True)
 
         while True:
             self.__check_buttons_press()
@@ -67,9 +77,9 @@ class App:
         self.__buzzer.play_success()
         return True
 
-    def __display_current_device(self) -> None:
+    def __display_current_device(self, reset: bool = False) -> None:
         self.__display.print("Loading...", line=2, clear_line=True)
-        current_device_data = self.__api.get_current_device(reset=True)
+        current_device_data = self.__api.get_current_device(reset=reset)
         self.__display_device(current_device_data)
 
     def __display_device(self, device_data: dict) -> None:
@@ -93,6 +103,8 @@ class App:
             current_device_data = self.__api.previous_device()
         elif was_right_button_pressed:
             current_device_data = self.__api.next_device()
+        else:
+            return
 
         self.__display_device(current_device_data)
         self.__buttons.reset()
@@ -125,4 +137,8 @@ class App:
 
 if __name__ == "__main__":
     app = App()
-    app.run()
+
+    try:
+        app.run()
+    except Exception as e:
+        app.handle_error(e)

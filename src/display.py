@@ -1,3 +1,5 @@
+import time
+
 import machine
 from lib.i2c_lcd import I2cLcd
 
@@ -20,9 +22,10 @@ class DisplayInterface:
         self.__lcd = I2cLcd(self.__i2c, 0x27, 2, 16)
         self.__init_symbols()
 
-    def print(self, text: str, line: int = 1, position: int = 1, clear_line: bool = False, clear_full: bool = False):
+    def print(self, text: str, line: int = 1, position: int = 1, clear_line: bool = False, clear_full: bool = False, trim: bool = True):
         self.__validate_inputs(line, position)
-        text = self.__trim_text(text)
+        if trim:
+            text = self.__trim_text(text)
 
         if clear_full:
             self.clear()
@@ -48,6 +51,17 @@ class DisplayInterface:
             self.__lcd.putstr(" " * 16)
         else:
             self.__lcd.clear()
+
+    def print_scroll_text(self, text: str, line: int = 1, delay: float = 0):
+        self.__validate_inputs(line)
+        if len(text) <= 16:
+            self.print(text, line)
+            return
+
+        padded_text = text + " " * 16
+        for start in range(len(padded_text) - 15):
+            self.print(padded_text[start:start + 16], line, clear_line=True)
+            time.sleep(delay)
 
     def __init_symbols(self):
         for symbol in Symbols.__dict__.values():
