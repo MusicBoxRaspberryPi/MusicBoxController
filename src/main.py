@@ -41,7 +41,7 @@ class App:
             return
 
         self.__display.print("Devices:", line=1, clear_full=True)
-        self.__display_current_device()
+        self.__display_current_device(reset=True)
 
         while True:
             self.__check_buttons_press()
@@ -67,9 +67,9 @@ class App:
         self.__buzzer.play_success()
         return True
 
-    def __display_current_device(self) -> None:
+    def __display_current_device(self, reset: bool = False) -> None:
         self.__display.print("Loading...", line=2, clear_line=True)
-        current_device_data = self.__api.get_current_device(reset=True)
+        current_device_data = self.__api.get_current_device(reset=reset)
         self.__display_device(current_device_data)
 
     def __display_device(self, device_data: dict) -> None:
@@ -93,6 +93,8 @@ class App:
             current_device_data = self.__api.previous_device()
         elif was_right_button_pressed:
             current_device_data = self.__api.next_device()
+        else:
+            return
 
         self.__display_device(current_device_data)
         self.__buttons.reset()
