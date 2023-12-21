@@ -12,3 +12,6 @@ class BuzzerInterface:
 
     def play_failure(self):
         self.__buzzer.beep([[392, 200], [330, 200], [261, 400]])
+
+    def play_ok(self):
+        self.__buzzer.beep([[2000, 100]])

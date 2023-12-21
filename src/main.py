@@ -97,6 +97,7 @@ class App:
         if not any((was_left_button_pressed, was_right_button_pressed)):
             return
 
+        self.__buzzer.play_ok()
         self.__display.print("Loading...", line=2, clear_line=True)
 
         if was_left_button_pressed:
