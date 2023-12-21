@@ -6,8 +6,8 @@ class ButtonsInterface:
         self.__left_button = Pin(left_button_pin, Pin.IN, Pin.PULL_UP)
         self.__right_button = Pin(right_button_pin, Pin.IN, Pin.PULL_UP)
 
-        self.__left_button.irq(trigger=Pin.IRQ_FALLING, handler=self.__set_left_button_pressed)
-        self.__right_button.irq(trigger=Pin.IRQ_FALLING, handler=self.__set_right_button_pressed)
+        self.__left_button.irq(trigger=Pin.IRQ_RISING, handler=self.__set_left_button_pressed)
+        self.__right_button.irq(trigger=Pin.IRQ_RISING, handler=self.__set_right_button_pressed)
 
         self.__left_button_pressed = False
         self.__right_button_pressed = False
@@ -27,3 +27,4 @@ class ButtonsInterface:
     def reset(self):
         self.__left_button_pressed = False
         self.__right_button_pressed = False
+
